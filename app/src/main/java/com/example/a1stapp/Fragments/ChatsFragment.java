@@ -44,7 +44,7 @@ public class ChatsFragment extends Fragment {
         usersList = new ArrayList<>();
 
         reference = FirebaseDatabase.getInstance().getReference().child("chats");
-        //TODO: Not single because - if someone sends me a message and we have never talked, his message must be shown.
+        //: Not single because - if someone sends me a message and we have never talked, the message must be shown.
         reference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -71,7 +71,7 @@ public class ChatsFragment extends Fragment {
         return view;
     }
 
-    private void readChats() {
+     public void readChats() {
         mUsers = new ArrayList<>();
         reference = FirebaseDatabase.getInstance().getReference().child("users");
         //TODO: Not single because - If a user logs out, his connection status doesn't change.

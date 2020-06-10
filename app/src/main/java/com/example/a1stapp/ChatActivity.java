@@ -27,6 +27,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class ChatActivity extends AppCompatActivity {
@@ -34,6 +36,7 @@ public class ChatActivity extends AppCompatActivity {
     private CircleImageView profile_image;
     private TextView username;
     private Toolbar toolbar;
+    Fragment chats, users, profile;
     private User user;
     private FirebaseUser firebaseUser;
     private DatabaseReference reference;
@@ -42,13 +45,9 @@ public class ChatActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
 
-        toolbar = findViewById(R.id.toolBar);
+        findViews();
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("");
-        profile_image = findViewById(R.id.profile_image);
-        username = findViewById(R.id.username);
-        firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-
         //TODO: Not single because - If I change the profile picture, the new picture won't be shown at the title.
         reference = FirebaseDatabase.getInstance().getReference().child("users").child(firebaseUser.getUid());
         reference.addValueEventListener(new ValueEventListener() {
@@ -68,16 +67,19 @@ public class ChatActivity extends AppCompatActivity {
 
         final TabLayout tabLayout = findViewById(R.id.tabLayout);
         final ViewPager viewPager = findViewById(R.id.viewPager);
-
         reference = FirebaseDatabase.getInstance().getReference("chats");
         reference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
-                // -> Note: there's a code On Hidden(). It isn't part of the code, please don't touch it. Thanks :)
-                viewPagerAdapter.addFragment(new ChatsFragment(), "Chats");
-                viewPagerAdapter.addFragment(new UsersFragment(), "Users");
-                viewPagerAdapter.addFragment(new ProfileFragment(), "Profile");
+                // -> Note: there's a code On Hidden(). It isn't connected to the exam, please don't touch it. Thanks :)
+                chats = new Fragment();
+                users = new Fragment();
+                profile = new Fragment();
+                viewPagerAdapter.addFragment(chats, "Chats");
+                viewPagerAdapter.addFragment(users, "Users");
+                viewPagerAdapter.addFragment(profile, "Profile");
+
                 viewPager.setAdapter(viewPagerAdapter);
                 tabLayout.setupWithViewPager(viewPager);
             }
@@ -85,6 +87,14 @@ public class ChatActivity extends AppCompatActivity {
             public void onCancelled(@NonNull DatabaseError databaseError) {
             }
         });
+
+    }
+
+    private void findViews() {
+        toolbar = findViewById(R.id.toolBar);
+        profile_image = findViewById(R.id.profile_image);
+        username = findViewById(R.id.username);
+        firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
     }
 
     class ViewPagerAdapter extends FragmentPagerAdapter{

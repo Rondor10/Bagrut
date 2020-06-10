@@ -71,15 +71,6 @@ public class MessageActivity extends AppCompatActivity {
         seenMessage(userId);
     }
 
-    private void findViews() {
-        recyclerView = findViewById(R.id.recycler_view);
-        profile_image = findViewById(R.id.profile_image);
-        username = findViewById(R.id.username);
-        btn_send = findViewById(R.id.btn_send);
-        text_send = findViewById(R.id.text_send);
-        firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-    }
-
     private void initViews() {
         //Send Message.
         btn_send.setOnClickListener(new View.OnClickListener() {
@@ -94,6 +85,7 @@ public class MessageActivity extends AppCompatActivity {
                 text_send.setText("");
             }
         });
+
         //Read Message.
         reference = FirebaseDatabase.getInstance().getReference().child("users").child(userId);
         //TODO: Not single because - If I stay at the page of a a chat with someone, and he changes his profile picture, his new picture won't be shown.
@@ -116,10 +108,9 @@ public class MessageActivity extends AppCompatActivity {
     }
 
     private void seenMessage(final String userid){
-
         //TODO: Not single because - If someone sends me a message and I enter the chat, it will be "SEEN", but if he sends again and I stay at the page - it will be "DELIVERED".
          reference = FirebaseDatabase.getInstance().getReference().child("chats");
-         reference.addValueEventListener(new ValueEventListener() {
+         reference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()){
@@ -137,18 +128,8 @@ public class MessageActivity extends AppCompatActivity {
         });
     }
 
-    private void sendMessage(String sender, final String receiver, String message) {
-        reference = FirebaseDatabase.getInstance().getReference();
-        HashMap<String, Object> hashMap = new HashMap<>();
-        hashMap.put("sender", sender);
-        hashMap.put("receiver", receiver);
-        hashMap.put("message", message);
-        hashMap.put("isSeen", false);
-        reference.child("chats").push().setValue(hashMap);
-    }
-
     private void readMessages(final String myid, final String userKey, final String imageurl) {
-        //TODO: Not single because - iI i stay at the page of a chat with someone and i send/he sends a message, it won't be updated and shown in the page.
+        //TODO: Not single because - iI i stay at the page of a chat with someone and I send/he sends a message, it won't be updated and shown in the page.
         mChat = new ArrayList<>();
         reference = FirebaseDatabase.getInstance().getReference().child("chats");
         reference.addValueEventListener(new ValueEventListener() {
@@ -169,6 +150,25 @@ public class MessageActivity extends AppCompatActivity {
             public void onCancelled(@NonNull DatabaseError databaseError) {
             }
         });
+    }
+
+    private void sendMessage(String sender, final String receiver, String message) {
+        reference = FirebaseDatabase.getInstance().getReference();
+        HashMap<String, Object> hashMap = new HashMap<>();
+        hashMap.put("sender", sender);
+        hashMap.put("receiver", receiver);
+        hashMap.put("message", message);
+        hashMap.put("isSeen", false);
+        reference.child("chats").push().setValue(hashMap);
+    }
+
+    private void findViews() {
+        recyclerView = findViewById(R.id.recycler_view);
+        profile_image = findViewById(R.id.profile_image);
+        username = findViewById(R.id.username);
+        btn_send = findViewById(R.id.btn_send);
+        text_send = findViewById(R.id.text_send);
+        firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
     }
 
     private void status(boolean status){
